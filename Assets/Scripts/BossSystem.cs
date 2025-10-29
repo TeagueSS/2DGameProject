@@ -51,23 +51,29 @@ public class BossSystem : MonoBehaviour
         
         nextThrowTime = Time.time + throwInterval;
     }
-    
+
+    // load our boss in on scene 
+    // we have this so we can add it and remove it if the user goes to the menu 
     void CreateBoss()
     {
+        // Doubel check they actually don't  exist 
         if (bossSprite == null)
         {
+            // if they don't then make them 
             bossSprite = new GameObject("Boss");
             bossSprite.transform.position = bossPosition;
-            
+
             bossRenderer = bossSprite.AddComponent<SpriteRenderer>();
             bossRenderer.sprite = bossImage;
             bossRenderer.sortingOrder = 10;
-            
+
             // Scale boss
             bossSprite.transform.localScale = Vector3.one * 3f;
         }
     }
-    
+
+    // Update allows us to have the boss match the camera
+    // (So if we wanted to have it on different levels)
     void Update()
     {
         if (gameManager != null && !gameManager.isGameOver)
@@ -83,7 +89,9 @@ public class BossSystem : MonoBehaviour
             }
         }
     }
-    
+
+    // update the positon during the scene 
+    // same as the previous method but without throwing 
     void UpdateBossPosition()
     {
         // Keep boss at side of screen, following camera height
@@ -197,7 +205,10 @@ public class BossSystem : MonoBehaviour
         
         return velocityVector;
     }
-    
+
+    // Where we want to throw 
+    // always aim for what they recently froze 
+    // we can assume the blocks above this will be the weakest 
     GameObject FindTargetBlock()
     {
         if (gameManager == null) return null;
@@ -206,7 +217,9 @@ public class BossSystem : MonoBehaviour
         float maxHeight = 0f;
         GameObject highestBlock = null;
         
+        // Loop through all of them to search 
         BlockController[] allBlocks = FindObjectsOfType<BlockController>();
+        // And throw 
         foreach (BlockController bc in allBlocks)
         {
             if (bc.isFrozen && bc.transform.position.y > maxHeight)
@@ -218,7 +231,9 @@ public class BossSystem : MonoBehaviour
         
         return highestBlock;
     }
-    
+
+    // Thow animation doesn't actually do anything I ran out of time 
+    // but the idea is still there. 
     IEnumerator BossThrowAnimation()
     {
         if (bossRenderer == null) yield break;
@@ -226,8 +241,10 @@ public class BossSystem : MonoBehaviour
         // Quick shake/flash animation
         Vector3 originalScale = bossSprite.transform.localScale;
         
+        // Loop 3 times for the animation! 
         for (int i = 0; i < 3; i++)
         {
+            // And make it move 
             bossSprite.transform.localScale = originalScale * 1.1f;
             yield return new WaitForSeconds(0.05f);
             bossSprite.transform.localScale = originalScale;

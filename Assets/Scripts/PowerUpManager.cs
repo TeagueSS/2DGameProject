@@ -8,29 +8,44 @@ public enum PowerUpType
     Glue     // Makes the next block stick better to the surface it lands on
 }
 
+
+// NONE OF THIS IS ACTUALLY USED 
+// this was created for a miltiplayer version.
+// I kept it in just incase I could use it later
+// but it didn't end up getting used 
 public class PowerUpManager : MonoBehaviour
 {
     [Header("Power-Up Settings")]
-    public GameObject[] powerUpPrefabs; // Array for Freeze and Glue prefabs (assign in inspector)
-    public float spawnInterval = 20f; // Time between power-up spawns
-    public float powerUpLifetime = 15f; // How long power-ups stay before disappearing
-    public float spawnRadius = 8f; // Radius from center where power-ups can spawn
-    public float spawnHeight = 5f; // Height at which power-ups spawn
-    
+    // Array for Freeze and Glue prefabs (assign in inspector)
+    public GameObject[] powerUpPrefabs;
+    // Time between power-up spawns
+    public float spawnInterval = 20f;
+    // How long power-ups stay before disappearing
+    public float powerUpLifetime = 15f;
+    // Radius from center where power-ups can spawn
+    public float spawnRadius = 8f;
+    // Height at which power-ups spawn
+    public float spawnHeight = 5f;
+
     [Header("Power-Up Effects")]
-    public GameObject powerUpEffectPrefab; // Particle effect when collected
-    public AudioClip freezeSound; // Sound for freeze power-up
-    public AudioClip glueSound; // Sound for glue power-up
-    
+    // Particle effect when collected
+    public GameObject powerUpEffectPrefab;
+    // Sound for freeze power-up
+    public AudioClip freezeSound;
+    // Sound for glue power-up
+    public AudioClip glueSound;
+
     [Header("Glue Settings")]
-    public float glueStickinessMultiplier = 3f; // How much more friction glued blocks have
-    public float glueDuration = 10f; // How long glue effect lasts
-    
+    // How much more friction glued blocks have
+    public float glueStickinessMultiplier = 3f;
+    // How long glue effect lasts
+    public float glueDuration = 10f;
+
     // References
     private GameManager gameManager;
     private float nextSpawnTime;
     private bool isGlueActive = false;
-    
+
     void Start()
     {
         // Get reference to GameManager
@@ -39,11 +54,11 @@ public class PowerUpManager : MonoBehaviour
         {
             gameManager = FindObjectOfType<GameManager>();
         }
-        
+
         // Set first spawn time
         nextSpawnTime = Time.time + spawnInterval;
     }
-    
+
     void Update()
     {
         // Check if it's time to spawn a new power-up
@@ -53,7 +68,7 @@ public class PowerUpManager : MonoBehaviour
             nextSpawnTime = Time.time + spawnInterval;
         }
     }
-    
+
     /// <summary>
     /// Spawns a random power-up (Freeze or Glue) at a random position
     /// </summary>
@@ -61,28 +76,28 @@ public class PowerUpManager : MonoBehaviour
     {
         // Randomly choose between Freeze (0) and Glue (1)
         PowerUpType type = (PowerUpType)Random.Range(0, 2);
-        
+
         // Calculate random spawn position within radius (X only for 2D, Z=0)
         Vector3 spawnPosition = new Vector3(
             Random.Range(-spawnRadius, spawnRadius),
             spawnHeight,
             0f // Z locked at 0 for 2D
         );
-        
+
         // Create the power-up object
         GameObject powerUp = CreatePowerUpObject(type, spawnPosition);
-        
+
         // Destroy after lifetime expires
         Destroy(powerUp, powerUpLifetime);
     }
-    
+
     /// <summary>
     /// Creates a power-up GameObject with appropriate visuals and components
     /// </summary>
     GameObject CreatePowerUpObject(PowerUpType type, Vector3 position)
     {
         GameObject powerUp;
-        
+
         // Use prefab if available, otherwise create sprite
         if (powerUpPrefabs != null && powerUpPrefabs.Length > (int)type && powerUpPrefabs[(int)type] != null)
         {
@@ -93,12 +108,12 @@ public class PowerUpManager : MonoBehaviour
             // Create a sprite-based power-up
             powerUp = new GameObject($"PowerUp_{type}");
             powerUp.transform.position = position;
-            
+
             // Add SpriteRenderer
             SpriteRenderer spriteRenderer = powerUp.AddComponent<SpriteRenderer>();
             spriteRenderer.sprite = CreatePowerUpSprite();
             spriteRenderer.sortingOrder = 10;
-            
+
             // Color based on type
             switch (type)
             {
@@ -109,26 +124,26 @@ public class PowerUpManager : MonoBehaviour
                     spriteRenderer.color = Color.yellow; // Yellow for glue
                     break;
             }
-            
+
             // Scale
             powerUp.transform.localScale = Vector3.one * 0.5f;
-            
+
             // Add collider (thin for 2D)
             BoxCollider collider = powerUp.AddComponent<BoxCollider>();
             collider.size = new Vector3(1f, 1f, 0.2f);
             collider.isTrigger = true;
         }
-        
+
         // Add power-up component
         PowerUpItem item = powerUp.AddComponent<PowerUpItem>();
         item.Initialize(type, gameManager, this);
-        
+
         // Add floating animation for visual appeal
         powerUp.AddComponent<FloatingAnimation>();
-        
+
         return powerUp;
     }
-    
+
     /// <summary>
     /// Creates a simple sprite for power-ups
     /// </summary>
@@ -136,7 +151,7 @@ public class PowerUpManager : MonoBehaviour
     {
         Texture2D texture = new Texture2D(32, 32);
         Color[] pixels = new Color[32 * 32];
-        
+
         // Create a star/diamond shape
         for (int y = 0; y < 32; y++)
         {
@@ -153,11 +168,11 @@ public class PowerUpManager : MonoBehaviour
                 }
             }
         }
-        
+
         texture.SetPixels(pixels);
         texture.filterMode = FilterMode.Point; // Pixel art style
         texture.Apply();
-        
+
         return Sprite.Create(
             texture,
             new Rect(0, 0, 32, 32),
@@ -165,7 +180,7 @@ public class PowerUpManager : MonoBehaviour
             32f
         );
     }
-    
+
     /// <summary>
     /// Called when a power-up is collected by a block
     /// </summary>
@@ -177,7 +192,7 @@ public class PowerUpManager : MonoBehaviour
         {
             audio = gameObject.AddComponent<AudioSource>();
         }
-        
+
         // Activate power-up based on type
         switch (type)
         {
@@ -189,7 +204,7 @@ public class PowerUpManager : MonoBehaviour
                 break;
         }
     }
-    
+
     /// <summary>
     /// Activates the Freeze power-up - instantly freezes the current block
     /// </summary>
@@ -200,7 +215,7 @@ public class PowerUpManager : MonoBehaviour
         {
             audio.PlayOneShot(freezeSound);
         }
-        
+
         // Freeze the current block immediately if it exists
         if (gameManager.currentBlock != null)
         {
@@ -218,7 +233,7 @@ public class PowerUpManager : MonoBehaviour
             StartCoroutine(ClearText(1.5f));
         }
     }
-    
+
     /// <summary>
     /// Activates the Glue power-up - makes next blocks stick better
     /// </summary>
@@ -229,7 +244,7 @@ public class PowerUpManager : MonoBehaviour
         {
             audio.PlayOneShot(glueSound);
         }
-        
+
         // Activate glue effect
         if (!isGlueActive)
         {
@@ -242,7 +257,7 @@ public class PowerUpManager : MonoBehaviour
             StartCoroutine(ClearText(1.5f));
         }
     }
-    
+
     /// <summary>
     /// Coroutine that handles the glue effect duration
     /// </summary>
@@ -250,50 +265,50 @@ public class PowerUpManager : MonoBehaviour
     {
         isGlueActive = true;
         gameManager.powerUpText.text = "GLUE ACTIVE! Blocks stick better!";
-        
+
         // Apply glue to current block if it exists
         if (gameManager.currentBlock != null)
         {
             ApplyGlueToBlock(gameManager.currentBlock);
         }
-        
+
         yield return new WaitForSeconds(2f);
         gameManager.powerUpText.text = "";
-        
+
         // Wait for duration
         yield return new WaitForSeconds(glueDuration - 2f);
-        
+
         isGlueActive = false;
     }
-    
+
     /// <summary>
     /// Applies glue effect to a block (increases friction)
     /// </summary>
     public void ApplyGlueToBlock(GameObject block)
     {
         if (!isGlueActive) return;
-        
+
         Rigidbody rb = block.GetComponent<Rigidbody>();
         if (rb != null)
         {
             // Increase friction to make it stick better
             rb.drag *= glueStickinessMultiplier;
             rb.angularDrag *= glueStickinessMultiplier;
-            
+
             // Visual feedback - make sprite slightly yellow tinted
             SpriteRenderer renderer = block.GetComponent<SpriteRenderer>();
             if (renderer == null)
             {
                 renderer = block.GetComponentInChildren<SpriteRenderer>();
             }
-            
+
             if (renderer != null)
             {
                 renderer.color = Color.Lerp(renderer.color, Color.yellow, 0.2f);
             }
         }
     }
-    
+
     /// <summary>
     /// Check if glue is currently active
     /// </summary>
@@ -301,7 +316,7 @@ public class PowerUpManager : MonoBehaviour
     {
         return isGlueActive;
     }
-    
+
     /// <summary>
     /// Clears the power-up text after a delay
     /// </summary>

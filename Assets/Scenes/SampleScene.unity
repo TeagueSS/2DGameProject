@@ -298,7 +298,7 @@ MonoBehaviour:
     hasSnow: 0
     hasBoss: 0
     unlockedCarCount: 6
-  - levelNumber: 2
+  - levelNumber: 1
     levelName: Bring an Umbrella!
     baseHeight: 20
     targetHeight: 30
