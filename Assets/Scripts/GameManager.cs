@@ -116,13 +116,6 @@ public class GameManager : MonoBehaviour
 
     void InitializeLayers()
     {
-        // Ensure layers exist - you'll need to add these in Unity's Layer settings
-        // Go to Edit > Project Settings > Tags and Layers
-        // Add "PreviewBlock" and "DroppedBlock" to available layers
-        
-        // For now, we'll use layer indices. You can assign these in the inspector.
-        // Layer 8 = PreviewBlock (doesn't collide with dropped blocks)
-        // Layer 9 = DroppedBlock (collides with everything)
     }
 
     void InitializeGame()
@@ -432,7 +425,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Rotation controls (disabled for sprites facing camera)
-        // If you want rotation, uncomment these:
+        // (This was originally for a 3d version )
         /*
         if (Input.GetKey(KeyCode.Q))
         {

@@ -662,8 +662,9 @@ public class MainMenuManager : MonoBehaviour
                 PlayerPrefs.Save();
             }
         }
-        
+
         // Play victory sound immediately
+        // It's the FNAF sound if you play my version
         PlayVictorySound();
         
         // Play completion cutscene
@@ -839,8 +840,10 @@ public class LevelConfig
 {
     public int levelNumber;
     public string levelName;
-    public float baseHeight; // Starting height (0, 10, 20, 30, 40)
-    public float targetHeight; // Win height (10, 20, 30, 40, 50)
+    // Starting height (0, 10, 20, 30, 40)
+    public float baseHeight; 
+    // Win height (10, 20, 30, 40, 50)
+    public float targetHeight; 
     public bool hasWind;
     public bool hasPowerups;
     public bool hasRain;

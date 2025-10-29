@@ -85,10 +85,13 @@ public class BlockController : MonoBehaviour
         rb.mass = 1f;
         rb.drag = 0.5f;
         rb.angularDrag = 0.5f;
-        rb.useGravity = false; // Start with no gravity until dropped
-        rb.isKinematic = true; // Start kinematic for grabbing
-        
-        // CRITICAL: Lock Z-axis and rotations for 2D sprite physics
+        // Start with no gravity until dropped
+        rb.useGravity = false; 
+        // Start kinematic for grabbing
+        rb.isKinematic = true;
+
+        // Lock Z-axis and rotations for 2D sprite physics
+        // (this is how I make 3d look 2D)
         rb.constraints = RigidbodyConstraints.FreezePositionZ | 
                         RigidbodyConstraints.FreezeRotationX | 
                         RigidbodyConstraints.FreezeRotationY | 
@@ -103,9 +106,10 @@ public class BlockController : MonoBehaviour
         {
             gameObject.tag = "Block";
         }
-        
+
         // Store the block's current scale for later use
-        blockScale = transform.localScale.x; // Assuming uniform scale
+        // Assuming uniform scale
+        blockScale = transform.localScale.x; 
     }
     
     void Update()
@@ -196,7 +200,8 @@ public class BlockController : MonoBehaviour
     /// </summary>
     public void FreezeInstantly()
     {
-        stillTimer = freezeDelay; // Set timer to max to trigger immediate freeze
+        // Set timer to max to trigger immediate freeze
+        stillTimer = freezeDelay; 
         FreezeBlock();
     }
     
