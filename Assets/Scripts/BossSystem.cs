@@ -7,23 +7,39 @@ using System.Collections;
 /// </summary>
 public class BossSystem : MonoBehaviour
 {
+    // Define all of ur boss system levels 
     [Header("Boss Settings")]
     public GameObject bossSprite;
+    // Our boss image to upload 
     public Sprite bossImage;
+    // Our boss position 
     public Vector3 bossPosition = new Vector3(12f, 20f, 0f);
-    
+
+    // And all of our attack settings!!!!
     [Header("Attack Settings")]
+    // Our throwable square they can hit us with 
     public GameObject throwableBlockPrefab;
+    // Our throw interval (I set this to 3 as balances pretty well )
     public float throwInterval = 3f;
-    public float throwForce = 10f;
-    public float throwArcHeight = 2f;
-    
+    // How hard they throw to hit our tower 
+    public float throwForce = 30f;
+    // and the arc shape we want
+    // here I do .5 so they aim bellow and the arc keeps alot of it's momentum 
+    public float throwArcHeight = .5f;
+
+
+    // Targeting section so we can see wehre we aiik 
     [Header("Targeting")]
-    public float targetHeightOffset = 5f; // Aim slightly above tower
-    public float accuracy = 0.8f; // 0-1, how accurate the boss is
-    
+    // Aim slightly above tower
+    public float targetHeightOffset = -10f;
+    // 0-1, how accurate the boss is 
+    public float accuracy = 1; 
+    // Create a instance of our game manager
     private GameManager gameManager;
+    // and a float to hold the next time we throw! 
     private float nextThrowTime;
+    // Our renderer for our boss sprite 
+    // i never got around to making this animate but the sprite is still there. 
     private SpriteRenderer bossRenderer;
     
     void Start()
@@ -80,18 +96,23 @@ public class BossSystem : MonoBehaviour
         }
     }
     
+    // Our throwing method! 
     void ThrowBlockAtTower()
     {
+        // if we can't find our gameManager exit 
         if (gameManager == null) return;
         
-        // Find target (highest block or random block)
+        // Find our target block 
         GameObject targetBlock = FindTargetBlock();
         
+        // and our target positon 
         Vector3 targetPos;
+        // make sure it isn't null before actually thorwing 
         if (targetBlock != null)
         {
+            // here we throw based on our accuracy 
             targetPos = targetBlock.transform.position;
-            // Add some inaccuracy
+            // Add we have some extra innacuracy 
             targetPos.x += Random.Range(-accuracy * 2f, accuracy * 2f);
             targetPos.y += Random.Range(-accuracy, accuracy);
         }
@@ -101,12 +122,13 @@ public class BossSystem : MonoBehaviour
             targetPos = new Vector3(0, gameManager.currentMaxHeight + targetHeightOffset, 0);
         }
         
-        // Create projectile
+        // Create projectile at the boss's position 
         GameObject projectile = CreateProjectile();
         projectile.transform.position = bossSprite.transform.position;
         
         // Calculate throw velocity
         Vector3 throwVelocity = CalculateThrowVelocity(
+            
             bossSprite.transform.position,
             targetPos
         );

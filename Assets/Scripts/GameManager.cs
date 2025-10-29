@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI heightText;
     public TextMeshProUGUI powerUpText;
-    public TextMeshProUGUI weatherText;
+    public TextMeshProUGUI weatherText; // Keeping variable but won't use it
     public TextMeshProUGUI windStrengthText; // Display current wind strength
     public GameObject gameOverPanel;
     public Button pauseButton; // Button to pause and return to menu
@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // Link weather system UI
+        // Link weather system UI (but we won't show weather text)
         if (weatherSystem != null && weatherText != null)
         {
             weatherSystem.weatherText = weatherText;
@@ -250,193 +250,169 @@ public class GameManager : MonoBehaviour
         // Create score text (top left with black background)
         if (scoreText == null)
         {
-            // Create background panel first
-            GameObject scoreBgObj = new GameObject("ScoreBackground");
-            scoreBgObj.transform.SetParent(mainCanvas.transform, false);
-            Image scoreBgImage = scoreBgObj.AddComponent<Image>();
-            scoreBgImage.color = new Color(0, 0, 0, 0.8f); // Black with 80% opacity
-            
-            RectTransform scoreBgRect = scoreBgObj.GetComponent<RectTransform>();
-            scoreBgRect.anchorMin = new Vector2(0, 1);
-            scoreBgRect.anchorMax = new Vector2(0, 1);
-            scoreBgRect.pivot = new Vector2(0, 1);
-            scoreBgRect.anchoredPosition = new Vector2(10, -10);
-            scoreBgRect.sizeDelta = new Vector2(200, 120); // Taller to fit all text without overlap
-            
-            // Create score text
             GameObject scoreObj = new GameObject("ScoreText");
-            scoreObj.transform.SetParent(scoreBgObj.transform, false);
-            scoreText = scoreObj.AddComponent<TextMeshProUGUI>();
-            scoreText.text = "Score: 0\nBlocks: 0";
-            scoreText.fontSize = 22; // Slightly smaller for better fit
-            scoreText.color = Color.white;
-            scoreText.alignment = TextAlignmentOptions.TopLeft;
+            scoreObj.transform.SetParent(mainCanvas.transform, false);
             
-            RectTransform scoreRect = scoreText.GetComponent<RectTransform>();
+            // Create background panel for score
+            Image bgImage = scoreObj.AddComponent<Image>();
+            bgImage.color = new Color(0, 0, 0, 0.5f);
+            
+            RectTransform scoreRect = scoreObj.GetComponent<RectTransform>();
             scoreRect.anchorMin = new Vector2(0, 1);
             scoreRect.anchorMax = new Vector2(0, 1);
             scoreRect.pivot = new Vector2(0, 1);
-            scoreRect.anchoredPosition = new Vector2(10, -8);
-            scoreRect.sizeDelta = new Vector2(180, 60); // Taller for 2 lines
+            scoreRect.sizeDelta = new Vector2(200, 80);
+            scoreRect.anchoredPosition = new Vector2(10, -10);
+
+            // Create text child
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(scoreObj.transform, false);
+            scoreText = textObj.AddComponent<TextMeshProUGUI>();
+            scoreText.text = "Score: 0\nBlocks: 0";
+            scoreText.fontSize = 24;
+            scoreText.color = Color.white;
+            scoreText.alignment = TextAlignmentOptions.TopLeft;
+            
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.sizeDelta = Vector2.zero;
+            textRect.offsetMin = new Vector2(10, 10);
+            textRect.offsetMax = new Vector2(-10, -10);
         }
 
-        // Create height text (below score, inside same background)
+        // Create height text (top right with black background)
         if (heightText == null)
         {
             GameObject heightObj = new GameObject("HeightText");
-            heightObj.transform.SetParent(scoreText.transform.parent, false); // Same parent as score (the black bg)
-            heightText = heightObj.AddComponent<TextMeshProUGUI>();
-            heightText.text = "Height: 0.0m";
-            heightText.fontSize = 20; // Smaller font
-            heightText.color = Color.white;
-            heightText.alignment = TextAlignmentOptions.TopLeft;
+            heightObj.transform.SetParent(mainCanvas.transform, false);
             
-            RectTransform heightRect = heightText.GetComponent<RectTransform>();
-            heightRect.anchorMin = new Vector2(0, 1);
-            heightRect.anchorMax = new Vector2(0, 1);
-            heightRect.pivot = new Vector2(0, 1);
-            heightRect.anchoredPosition = new Vector2(10, -65); // More spacing - below score text
-            heightRect.sizeDelta = new Vector2(180, 50); // Taller for potential 2 lines in level mode
+            // Create background panel
+            Image bgImage = heightObj.AddComponent<Image>();
+            bgImage.color = new Color(0, 0, 0, 0.5f);
+            
+            RectTransform heightRect = heightObj.GetComponent<RectTransform>();
+            heightRect.anchorMin = new Vector2(1, 1);
+            heightRect.anchorMax = new Vector2(1, 1);
+            heightRect.pivot = new Vector2(1, 1);
+            heightRect.sizeDelta = new Vector2(250, 100);
+            heightRect.anchoredPosition = new Vector2(-10, -10);
+
+            // Create text child
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(heightObj.transform, false);
+            heightText = textObj.AddComponent<TextMeshProUGUI>();
+            heightText.text = "Height: 0.0m";
+            heightText.fontSize = 24;
+            heightText.color = Color.white;
+            heightText.alignment = TextAlignmentOptions.TopRight;
+            
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.sizeDelta = Vector2.zero;
+            textRect.offsetMin = new Vector2(10, 10);
+            textRect.offsetMax = new Vector2(-10, -10);
         }
 
-        // Create power-up text (center of screen)
+        // Create power-up text (center top)
         if (powerUpText == null)
         {
             GameObject powerUpObj = new GameObject("PowerUpText");
             powerUpObj.transform.SetParent(mainCanvas.transform, false);
+            
             powerUpText = powerUpObj.AddComponent<TextMeshProUGUI>();
             powerUpText.text = "";
             powerUpText.fontSize = 36;
             powerUpText.color = Color.yellow;
             powerUpText.alignment = TextAlignmentOptions.Center;
             
-            RectTransform powerUpRect = powerUpText.GetComponent<RectTransform>();
-            powerUpRect.anchorMin = new Vector2(0.5f, 0.7f);
-            powerUpRect.anchorMax = new Vector2(0.5f, 0.7f);
-            powerUpRect.pivot = new Vector2(0.5f, 0.5f);
-            powerUpRect.anchoredPosition = Vector2.zero;
+            RectTransform powerUpRect = powerUpObj.GetComponent<RectTransform>();
+            powerUpRect.anchorMin = new Vector2(0.5f, 1);
+            powerUpRect.anchorMax = new Vector2(0.5f, 1);
+            powerUpRect.pivot = new Vector2(0.5f, 1);
             powerUpRect.sizeDelta = new Vector2(600, 100);
+            powerUpRect.anchoredPosition = new Vector2(0, -100);
         }
 
-        // Weather text removed - only showing wind speed now
+        // NO WEATHER TEXT - We're removing this display
         
-        // Create wind strength text (top right - this is the only weather info shown)
-        if (windStrengthText == null)
-        {
-            GameObject windObj = new GameObject("WindStrengthText");
-            windObj.transform.SetParent(mainCanvas.transform, false);
-            windStrengthText = windObj.AddComponent<TextMeshProUGUI>();
-            windStrengthText.text = "Wind: 0.0";
-            windStrengthText.fontSize = 24; // Slightly larger since it's the only one
-            windStrengthText.color = new Color(0.8f, 0.8f, 1f); // Light blue
-            windStrengthText.alignment = TextAlignmentOptions.TopRight;
-            
-            RectTransform windRect = windStrengthText.GetComponent<RectTransform>();
-            windRect.anchorMin = new Vector2(1, 1);
-            windRect.anchorMax = new Vector2(1, 1);
-            windRect.pivot = new Vector2(1, 1);
-            windRect.anchoredPosition = new Vector2(-20, -20); // Top right position
-            windRect.sizeDelta = new Vector2(200, 50);
-        }
+        // NO WIND STRENGTH TEXT - We're removing this display too
 
-        // Create pause/menu button (top center)
+        // Create game over panel (initially hidden)
+        if (gameOverPanel == null)
+        {
+            GameObject gameOverObj = new GameObject("GameOverPanel");
+            gameOverObj.transform.SetParent(mainCanvas.transform, false);
+            
+            Image img = gameOverObj.AddComponent<Image>();
+            img.color = new Color(0, 0, 0, 0.8f);
+            
+            RectTransform goRect = gameOverObj.GetComponent<RectTransform>();
+            goRect.anchorMin = Vector2.zero;
+            goRect.anchorMax = Vector2.one;
+            goRect.sizeDelta = Vector2.zero;
+            
+            // Create game over text
+            GameObject goText = new GameObject("GameOverText");
+            goText.transform.SetParent(gameOverObj.transform, false);
+            
+            TextMeshProUGUI text = goText.AddComponent<TextMeshProUGUI>();
+            text.text = "GAME OVER";
+            text.fontSize = 72;
+            text.color = Color.red;
+            text.alignment = TextAlignmentOptions.Center;
+            
+            RectTransform textRect = goText.GetComponent<RectTransform>();
+            textRect.anchorMin = new Vector2(0.5f, 0.5f);
+            textRect.anchorMax = new Vector2(0.5f, 0.5f);
+            textRect.sizeDelta = new Vector2(600, 200);
+            textRect.anchoredPosition = Vector2.zero;
+            
+            gameOverPanel = gameOverObj;
+            gameOverPanel.SetActive(false);
+        }
+        
+        // Create pause button - CENTER TOP
         if (pauseButton == null)
         {
             GameObject pauseObj = new GameObject("PauseButton");
             pauseObj.transform.SetParent(mainCanvas.transform, false);
-            Image buttonImg = pauseObj.AddComponent<Image>();
-            buttonImg.color = Color.white;
+            
+            Image btnImg = pauseObj.AddComponent<Image>();
+            btnImg.color = Color.white;
+            
             pauseButton = pauseObj.AddComponent<Button>();
             pauseButton.onClick.AddListener(PauseAndMenu);
             
             RectTransform pauseRect = pauseObj.GetComponent<RectTransform>();
+            // CENTER TOP
             pauseRect.anchorMin = new Vector2(0.5f, 1);
             pauseRect.anchorMax = new Vector2(0.5f, 1);
             pauseRect.pivot = new Vector2(0.5f, 1);
-            pauseRect.anchoredPosition = new Vector2(0, -20);
-            pauseRect.sizeDelta = new Vector2(150, 40);
+            pauseRect.sizeDelta = new Vector2(120, 40);
+            pauseRect.anchoredPosition = new Vector2(0, -10); // 10 pixels from top
             
-            // Add text to button
-            GameObject pauseTextObj = new GameObject("Text");
-            pauseTextObj.transform.SetParent(pauseObj.transform, false);
-            TextMeshProUGUI pauseText = pauseTextObj.AddComponent<TextMeshProUGUI>();
-            pauseText.text = "MENU";
-            pauseText.fontSize = 24;
-            pauseText.color = Color.black;
-            pauseText.alignment = TextAlignmentOptions.Center;
+            // Create button text
+            GameObject btnText = new GameObject("Text");
+            btnText.transform.SetParent(pauseObj.transform, false);
             
-            RectTransform pauseTextRect = pauseTextObj.GetComponent<RectTransform>();
-            pauseTextRect.anchorMin = Vector2.zero;
-            pauseTextRect.anchorMax = Vector2.one;
-            pauseTextRect.sizeDelta = Vector2.zero;
-        }
-
-        // Create game over panel (hidden by default)
-        if (gameOverPanel == null)
-        {
-            gameOverPanel = new GameObject("GameOverPanel");
-            gameOverPanel.transform.SetParent(mainCanvas.transform, false);
-            Image panelImg = gameOverPanel.AddComponent<Image>();
-            panelImg.color = new Color(0, 0, 0, 0.8f);
+            TextMeshProUGUI buttonText = btnText.AddComponent<TextMeshProUGUI>();
+            buttonText.text = "MENU";
+            buttonText.fontSize = 20;
+            buttonText.color = Color.black;
+            buttonText.alignment = TextAlignmentOptions.Center;
             
-            RectTransform panelRect = gameOverPanel.GetComponent<RectTransform>();
-            panelRect.anchorMin = Vector2.zero;
-            panelRect.anchorMax = Vector2.one;
-            panelRect.sizeDelta = Vector2.zero;
-            
-            // Game over text
-            GameObject gameOverTextObj = new GameObject("GameOverText");
-            gameOverTextObj.transform.SetParent(gameOverPanel.transform, false);
-            TextMeshProUGUI gameOverText = gameOverTextObj.AddComponent<TextMeshProUGUI>();
-            gameOverText.text = "GAME OVER";
-            gameOverText.fontSize = 72;
-            gameOverText.color = Color.red;
-            gameOverText.alignment = TextAlignmentOptions.Center;
-            
-            RectTransform gameOverTextRect = gameOverTextObj.GetComponent<RectTransform>();
-            gameOverTextRect.anchorMin = new Vector2(0.5f, 0.5f);
-            gameOverTextRect.anchorMax = new Vector2(0.5f, 0.5f);
-            gameOverTextRect.pivot = new Vector2(0.5f, 0.5f);
-            gameOverTextRect.anchoredPosition = new Vector2(0, 100);
-            gameOverTextRect.sizeDelta = new Vector2(600, 100);
-            
-            // Restart button
-            GameObject restartButtonObj = new GameObject("RestartButton");
-            restartButtonObj.transform.SetParent(gameOverPanel.transform, false);
-            Image restartImg = restartButtonObj.AddComponent<Image>();
-            restartImg.color = Color.white;
-            Button restartBtn = restartButtonObj.AddComponent<Button>();
-            restartBtn.onClick.AddListener(RestartGame);
-            
-            RectTransform restartRect = restartButtonObj.GetComponent<RectTransform>();
-            restartRect.anchorMin = new Vector2(0.5f, 0.5f);
-            restartRect.anchorMax = new Vector2(0.5f, 0.5f);
-            restartRect.pivot = new Vector2(0.5f, 0.5f);
-            restartRect.anchoredPosition = new Vector2(0, -50);
-            restartRect.sizeDelta = new Vector2(200, 60);
-            
-            // Restart button text
-            GameObject restartTextObj = new GameObject("Text");
-            restartTextObj.transform.SetParent(restartButtonObj.transform, false);
-            TextMeshProUGUI restartText = restartTextObj.AddComponent<TextMeshProUGUI>();
-            restartText.text = "RESTART";
-            restartText.fontSize = 32;
-            restartText.color = Color.black;
-            restartText.alignment = TextAlignmentOptions.Center;
-            
-            RectTransform restartTextRect = restartTextObj.GetComponent<RectTransform>();
-            restartTextRect.anchorMin = Vector2.zero;
-            restartTextRect.anchorMax = Vector2.one;
-            restartTextRect.sizeDelta = Vector2.zero;
-            
-            gameOverPanel.SetActive(false);
+            RectTransform btnTextRect = btnText.GetComponent<RectTransform>();
+            btnTextRect.anchorMin = Vector2.zero;
+            btnTextRect.anchorMax = Vector2.one;
+            btnTextRect.sizeDelta = Vector2.zero;
         }
     }
 
     void HandleInput()
     {
-        // Exit if no current block or if already dropped
-        if (currentBlock == null || currentBlock.GetComponent<BlockController>()?.isDropped == true) 
+        if (currentBlock == null) 
             return;
 
         float horizontal = Input.GetAxis("Horizontal");
@@ -617,7 +593,7 @@ public class GameManager : MonoBehaviour
 
     void UpdateScore()
     {
-        // Score based on height (10 points per meter) minus blocks used
+        // ORIGINAL SCORE CALCULATION: Score based on height (10 points per meter) minus blocks used
         int heightScore = Mathf.RoundToInt(currentMaxHeight * 10);
         currentScore = heightScore - blocksUsed;
     }
@@ -638,20 +614,6 @@ public class GameManager : MonoBehaviour
             else
             {
                 heightText.text = $"Height: {currentMaxHeight:F1}m";
-            }
-        }
-        
-        // Update wind strength display if weather system is active (only showing wind now)
-        if (windStrengthText != null && weatherSystem != null)
-        {
-            if (weatherSystem.IsWindActive())
-            {
-                windStrengthText.text = $"Wind: {weatherSystem.windForce:F1}";
-                windStrengthText.gameObject.SetActive(true);
-            }
-            else
-            {
-                windStrengthText.gameObject.SetActive(false);
             }
         }
     }
@@ -711,20 +673,24 @@ public class GameManager : MonoBehaviour
     {
         if (currentLevel == null) return;
 
-        // Configure weather system based on level
+        // Configure weather system based on level settings
         if (weatherSystem != null)
         {
-            if (currentLevel.hasRain)
-            {
-                weatherSystem.ChangeWeather(WeatherType.Rainy);
-            }
-            else if (currentLevel.hasWind)
+            // Check the level configuration flags and set weather accordingly
+            if (currentLevel.hasWind)
             {
                 weatherSystem.ChangeWeather(WeatherType.Windy);
+                Debug.Log($"Level {currentLevel.levelNumber} ({currentLevel.levelName}) - Wind ENABLED with force: {weatherSystem.windForce}");
+            }
+            else if (currentLevel.hasRain)
+            {
+                weatherSystem.ChangeWeather(WeatherType.Rainy);
+                Debug.Log($"Level {currentLevel.levelNumber} ({currentLevel.levelName}) - Rain enabled, Wind DISABLED");
             }
             else
             {
                 weatherSystem.ChangeWeather(WeatherType.Sunny);
+                Debug.Log($"Level {currentLevel.levelNumber} ({currentLevel.levelName}) - Sunny weather, Wind DISABLED");
             }
         }
 
@@ -1019,10 +985,7 @@ public class GameManager : MonoBehaviour
             powerUpText.color = Color.yellow; // Reset to default color
         }
         
-        if (weatherText != null)
-        {
-            weatherText.text = "";
-        }
+        // We're not showing weather text anymore
         
         if (windStrengthText != null)
         {

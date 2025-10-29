@@ -1,0 +1,18 @@
+From the original prompt I changed alot but kept the same overall idea.
+Instead of making it Multiplayer and with controllers (Which I didn't have access to all the time)
+I decided to keep the tower stacking, but change the game to be single player and add a theme.
+Now I save my cat from Aliens!!!
+An intro credit scene plays but the tower stacking itself is the same.
+
+Using powerups to gain an advantage didn't make sense given I wasn't playing against another player.
+So instead I added the elements and a boss to make it harder.
+
+The elements include:
+Wind, Rain, Snow 
+These actually work very similar to the power ups
+as they push objects one way or another, make them hard to lock, and get in the way.
+(The original goals for the power ups)
+
+The boss also acts to add some difficulty and I added making it throw blocks to make
+it feel like every level has a new way that it makes it harder. 
+
