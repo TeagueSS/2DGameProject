@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 4a05c7f75994d409e90becf4969878e8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - basePlatformPrefab: {fileID: 4687555567977118025, guid: a3dfeae8f313a42ff90c064b3d35dd20, type: 3}
+  - blockDropperPrefab: {instanceID: 0}
+  - spawnPoint: {instanceID: 0}
+  - weatherSystem: {instanceID: 0}
+  - scoreText: {instanceID: 0}
+  - heightText: {instanceID: 0}
+  - powerUpText: {instanceID: 0}
+  - gameOverPanel: {instanceID: 0}
+  - currentBlock: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
