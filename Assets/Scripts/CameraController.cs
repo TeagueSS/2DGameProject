@@ -1,18 +1,26 @@
 using UnityEngine;
 
+
+// Meant to move our camera into the right positon on game start -> 
 public class CameraController : MonoBehaviour
 {
-    [Header("Camera Settings")]    public Transform target; // The base platform or focus point
-    public bool isOrthographic = true; // Set camera to orthographic
-    public float orthographicSize = 10f; // Size of orthographic camera
-    
+    // The base platform or focus point
+    [Header("Camera Settings")] public Transform target; 
+    // Set camera to orthographic (2D)
+    public bool isOrthographic = true; 
+    // Size of orthographic camera
+    public float orthographicSize = 10f;
+
     [Header("Position Settings")]
-    public Vector3 defaultPosition = new Vector3(0, 10, 0); // Default camera position
-    public float defaultZ = -15f; // Default Z distance from tower
-    
+    // Default camera position
+    public Vector3 defaultPosition = new Vector3(0, 10, 0); 
+    // Default Z distance from tower
+
+    public float defaultZ = -15f; 
     [Header("Dynamic Following")]
     public bool followHeight = true;
-    public float heightOffset = 10f; // How much above the highest block to position camera
+    // How much above the highest block to position camera
+    public float heightOffset = 10f; 
     public float smoothSpeed = 5f;
     public float minY = 5f;
     public float maxY = 100f;
@@ -21,22 +29,26 @@ public class CameraController : MonoBehaviour
     public float shakeAmount = 0.1f;
     public float shakeDuration = 0.2f;
     private float currentShakeTime = 0f;
+    // Pointers to our game manager, our camera, and our target height 
 
     private GameManager gameManager;
     private Camera cam;
     private float targetHeight;
+    // Velocity was for loading in animations to 
+    // scroll up the tower, but it never ended up working.
     private Vector3 currentVelocity;
 
+    // Load our camera into our scene 
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
         cam = GetComponent<Camera>();
-        
+
         if (cam == null)
         {
             cam = gameObject.AddComponent<Camera>();
         }
-        
+
         // Set camera to orthographic for 2D gameplay
         cam.orthographic = isOrthographic;
         cam.orthographicSize = orthographicSize;
@@ -50,7 +62,7 @@ public class CameraController : MonoBehaviour
                 target = platform.transform;
             }
         }
-        
+
         // Initialize to default position
         transform.position = new Vector3(defaultPosition.x, defaultPosition.y, defaultZ);
         targetHeight = minY;
@@ -59,7 +71,7 @@ public class CameraController : MonoBehaviour
     void LateUpdate()
     {
         if (target == null) return;
-        
+
         HandleCameraMovement();
         HandleCameraShake();
     }
@@ -76,8 +88,8 @@ public class CameraController : MonoBehaviour
 
         // Calculate desired position - centered on tower with fixed Z
         Vector3 desiredPosition = new Vector3(
-            target.position.x + defaultPosition.x, 
-            targetHeight, 
+            target.position.x + defaultPosition.x,
+            targetHeight,
             target.position.z + defaultZ
         );
 
@@ -100,13 +112,16 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    // Shake our camera, never got this working sadly 
     public void TriggerShake(float duration = -1f, float amount = -1f)
     {
+        // Move our camera around for our duration 
         if (duration > 0) shakeDuration = duration;
         if (amount > 0) shakeAmount = amount;
         currentShakeTime = shakeDuration;
     }
 
+    // Set where we want our camera to smoothy move to 
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
@@ -117,7 +132,7 @@ public class CameraController : MonoBehaviour
         targetHeight = minY;
         transform.position = new Vector3(defaultPosition.x, defaultPosition.y, defaultZ);
     }
-    
+
     /// <summary>
     /// Reset camera to a specific height (used when starting at elevated positions)
     /// </summary>
@@ -125,7 +140,7 @@ public class CameraController : MonoBehaviour
     {
         targetHeight = startHeight + heightOffset;
         transform.position = new Vector3(defaultPosition.x, startHeight + heightOffset, defaultZ);
-        
+
         // Update minY if start height is higher
         if (startHeight > minY)
         {

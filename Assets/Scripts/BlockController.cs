@@ -139,11 +139,15 @@ public class BlockController : MonoBehaviour
         // Rotation is locked, so we only check velocity
         bool isMoving = positionDelta > movementThreshold ||
                        rb.velocity.magnitude > 0.1f;
-        
+
+        // This allows us to freeze it 
+        // ORGIINAlLY used in the 3d version
+        // no longer applicable 
         if (!isMoving)
         {
+            // Here we update the timer as needed 
             stillTimer += Time.deltaTime;
-            
+            // And call freeze if we're supposed to 
             if (stillTimer >= freezeDelay)
             {
                 FreezeBlock();
@@ -151,42 +155,52 @@ public class BlockController : MonoBehaviour
         }
         else
         {
+            // otherwise just update our time to check again 
             stillTimer = 0f;
             lastPosition = transform.position;
         }
     }
     
+    // Drop block method 
     public void StartDrop()
     {
+        // Check if our block has already been dropped 
         if (!isDropped)
         {
+            // Mark all of our values so it falls properly
+            // I'm hard coding these so they always work regardelss of what 
+            // the sprite has attached to it 
             isDropped = true;
             rb.isKinematic = false;
             rb.useGravity = true;
-            
+
             // Reset scale to normal
             transform.localScale = Vector3.one * blockScale;
-            
+
             // Add a small downward force to ensure it starts falling
             rb.AddForce(Vector3.down * 2f, ForceMode.Impulse);
         }
     }
     
+    // Freeze our block power up. No longer used 
     void FreezeBlock()
     {
+        // Make sure it isn't alredy frozen before we update 
         if (!isFrozen)
         {
+            // if not then update our bool 
             isFrozen = true;
-            
-            // Make the block static
+
+            // And upate our values so it stays in place 
+            // This un does what the method above it does 
             rb.isKinematic = true;
             rb.useGravity = false;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            
+
             // Visual feedback for frozen state
             StartCoroutine(FreezeEffect());
-            
+
             // Notify game manager
             if (gameManager != null)
             {
@@ -204,7 +218,9 @@ public class BlockController : MonoBehaviour
         stillTimer = freezeDelay; 
         FreezeBlock();
     }
-    
+
+    // Freeze effect for power ups 
+    // no longer used as the game changed 
     IEnumerator FreezeEffect()
     {
         // Create frozen color effect for sprite
@@ -217,15 +233,17 @@ public class BlockController : MonoBehaviour
             float duration = 0.5f;
             float elapsed = 0f;
             
+            // Check if we are still suppoed to be freezign 
             while (elapsed < duration)
             {
+                // if yes then update our time 
                 float t = elapsed / duration;
                 spriteRenderer.color = Color.Lerp(originalColor, frozenColor, t);
-                
-                // Add a scale effect
+
+                //Our object scale 
                 float scaleMultiplier = 1f + Mathf.Sin(t * Mathf.PI) * 0.1f;
                 transform.localScale = Vector3.one * (blockScale * scaleMultiplier);
-                
+                // And then increment our time 
                 elapsed += Time.deltaTime;
                 yield return null;
             }
@@ -235,56 +253,11 @@ public class BlockController : MonoBehaviour
         }
     }
     
-    public bool IsStable()
-    {
-        // For 2D sprites that don't rotate, always stable unless falling
-        return rb.velocity.magnitude < 0.1f;
-    }
-    
-    void OnCollisionEnter(Collision collision)
-    {
-        if (isDropped && !isFrozen)
-        {
-            // Play impact sound if you have one
-            // AudioManager.Instance.PlayImpact();
-            
-            // Reset still timer when hitting something
-            stillTimer = 0f;
-        }
-    }
+    // Is Stable to check sprite positon 
+   
     
     // Public methods for power-ups
-    public void ApplyExplosionForce(Vector3 explosionPosition, float force, float radius)
-    {
-        if (!isFrozen && rb != null)
-        {
-            // Only apply force in X and Y directions for 2D
-            Vector3 direction = transform.position - explosionPosition;
-            direction.z = 0; // Remove Z component
-            direction.Normalize();
-            
-            float distance = Vector2.Distance(
-                new Vector2(transform.position.x, transform.position.y),
-                new Vector2(explosionPosition.x, explosionPosition.y)
-            );
-            
-            if (distance < radius)
-            {
-                float adjustedForce = force * (1 - distance / radius);
-                rb.AddForce(direction * adjustedForce, ForceMode.Impulse);
-            }
-        }
-    }
     
-    public void ApplyMagneticForce(Vector3 targetPosition, float strength)
-    {
-        if (!isFrozen && rb != null)
-        {
-            // Only apply force in X and Y for 2D
-            Vector3 direction = targetPosition - transform.position;
-            direction.z = 0; // Remove Z component
-            direction.Normalize();
-            rb.AddForce(direction * strength);
-        }
-    }
+    
+    
 }

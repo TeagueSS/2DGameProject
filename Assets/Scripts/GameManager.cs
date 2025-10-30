@@ -7,54 +7,81 @@ using TMPro; // Import TextMeshPro
 public class GameManager : MonoBehaviour
 {
     [Header("Game Objects")]
-    public GameObject[] voxelBlockPrefabs; // Array of different voxel block prefabs from asset pack
+    // Our array of 'sprites' or blocks we drop 
+    // It was originally voxels, but then the game looked bad 
+    // so I changed it to a full 2D look.
     
+    public GameObject[] voxelBlockPrefabs;
+
     [Header("Block Scale Settings")]
     [Tooltip("Global scale multiplier for all blocks")]
+    // Scale multiplier to make the blocks scale actually seem fair in 
+    // how far they have to stack 
     public float globalBlockScale = 0.5f;
-    
+
     [Tooltip("Individual scale multipliers for each block prefab (matches voxelBlockPrefabs array)")]
-    public float[] blockPrefabScaleMultipliers; // Individual scale for each block type
+    // Individual scale for each block type
+    // This never ended up working, I just ended up using the global multiplier 
+    public float[] blockPrefabScaleMultipliers;
 
     [Header("Platform Settings - NO PREFAB NEEDED")]
     [Tooltip("Platform dimensions (width, height, depth)")]
+    // Spawn in our platform! 
+    // I originally wanted this to be a prefab, but for some reason 
+    // it wasn't taking so I hard coded the positoin 
     public Vector3 platformDimensions = new Vector3(30f, 1f, 10f);
-    
+
     [Tooltip("Platform color")]
+    // What color we want it to be, I made it gray to look like a road, 
+    //but also not look weird in the clouds or the space scene 
     public Color platformColor = new Color(0.5f, 0.5f, 0.5f);
-    
+
     [Tooltip("Platform material (optional)")]
+    // This is un-used, I wanted to add a texture but it looked weird 
     public Material platformMaterial;
 
     [Header("Spawn Settings")]
+    // Where we want our platform to spawn (Each level is changes)
     public Transform spawnPoint;
+    // It's by default set to level 2, but this gets overwritten each level 
     public float spawnHeight = 10f;
+    // All of our game settings 
+    // Power up aren't used 
 
     [Header("Game Settings")]
     public float freezeDelay = 3f;
     public float despawnHeight = -20f;
-    public float moveSpeed = 5f; // Movement speed for current block
+    // Movement speed for current block
+    public float moveSpeed = 5f; 
     public float rotationSpeed = 90f;
 
     [Header("Layer Settings")]
-    public string previewLayer = "PreviewBlock"; // Layer for blocks before dropping
-    public string droppedLayer = "DroppedBlock"; // Layer for blocks after dropping
+    // Layer for blocks before dropping
+    public string previewLayer = "PreviewBlock"; 
+    // Layer for blocks after dropping
+    public string droppedLayer = "DroppedBlock";
 
     [Header("Power-Up Settings")]
     // Freeze and Glue power-ups are handled by PowerUpManager
 
     [Header("Weather System")]
-    public WeatherSystem weatherSystem; // Assign in inspector or will find automatically
+    // Create our weather system! Originally was meant to do more than just wind / snow 
+    // and add sound, but the sound was quite annoying.
+    public WeatherSystem weatherSystem; 
+    // Spawn our text mesh pro boxes in 
 
     [Header("UI - Auto-Generated TextMeshPro")]
-    [Tooltip("These will be created automatically if not assigned")]
+    [Tooltip("These are spawned in but you can drag if you want it to look a certian way.")]
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI heightText;
     public TextMeshProUGUI powerUpText;
-    public TextMeshProUGUI weatherText; // Keeping variable but won't use it
-    public TextMeshProUGUI windStrengthText; // Display current wind strength
+    // Keeping variable but won't use it
+    public TextMeshProUGUI weatherText; 
+    // Display current wind strength
+    public TextMeshProUGUI windStrengthText; 
     public GameObject gameOverPanel;
-    public Button pauseButton; // Button to pause and return to menu
+    // Button to pause and return to menu
+    public Button pauseButton;
     private Canvas mainCanvas;
 
     [Header("Game State")]
@@ -62,18 +89,27 @@ public class GameManager : MonoBehaviour
     public float currentMaxHeight = 0f;
     public bool isGameOver = false;
     public bool isPaused = false;
-    public int blocksUsed = 0; // Track number of blocks/cars used
+    // Track number of blocks/cars used
+    // We use this to track calculate our score 
+    // the more blocks used the less points you get 
+    public int blocksUsed = 0;
 
     [Header("Level Settings")]
-    public LevelConfig currentLevel; // Current level configuration
-    public float targetHeight = 10f; // Height needed to win
-    public bool isLevelMode = false; // True when playing a specific level
+    // Current level configuration
+    // This is the real meat and potatoes and where we assign our stuff 
+    public LevelConfig currentLevel; 
+    // Height needed to win
+    public float targetHeight = 10f; 
+    // Boss mode for the last level 
+    public bool isLevelMode = false; 
 
     // Private variables
     private GameObject currentPlatform;
-    public GameObject currentBlock; // Made public for PowerUpManager access
+    // Made public for PowerUpManager access
+    public GameObject currentBlock; 
     private List<GameObject> activeBlocks = new List<GameObject>();
-    private Vector2 movementBounds = new Vector2(10f, 10f); // X and Y boundaries for 2D movement
+    // X and Y boundaries for 2D movement
+    private Vector2 movementBounds = new Vector2(10f, 10f); 
     private CameraController cameraController;
     private MainMenuManager mainMenuManager;
     private BlockDropper blockDropper;
@@ -100,9 +136,11 @@ public class GameManager : MonoBehaviour
         if (!isGameOver && !isPaused)
         {
             HandleInput();
-            UpdateCurrentBlockPosition(); // Keep current block at camera height
+            // Keep current block at camera height
+            UpdateCurrentBlockPosition(); 
             UpdateHeight();
-            UpdateScore(); // Score is based on max height
+            // Score is based on max height
+            UpdateScore(); 
             CheckFallenBlocks();
             UpdateUI();
             
@@ -458,6 +496,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Call our block dropper to block 
     void DropCurrentBlock()
     {
         if (currentBlock != null)
