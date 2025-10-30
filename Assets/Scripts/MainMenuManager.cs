@@ -14,7 +14,8 @@ public class MainMenuManager : MonoBehaviour
 {
     [Header("Level Locking Settings")]
     [Tooltip("If TRUE, players must complete levels in order. If FALSE, all levels are unlocked from start.")]
-    public bool enableLevelLocking = false; // Set to false to unlock all levels!
+    // Set to false to unlock all levels!
+    public bool enableLevelLocking = false; 
     
     [Header("Main Menu UI")]
     public GameObject mainMenuPanel;
@@ -27,13 +28,19 @@ public class MainMenuManager : MonoBehaviour
     [Header("Background Settings")]
     public RawImage backgroundImage;
     public Texture2D menuBackgroundTexture;
-    
+
     [Header("Level Selection")]
-    public Button[] levelButtons = new Button[5]; // 5 levels
+    // 5 levels
+    // this shoudl really depend on the level size in game manager,
+    // but I hard coded this 
+    public Button[] levelButtons = new Button[5]; 
     public TextMeshProUGUI[] levelDescriptions = new TextMeshProUGUI[5];
-    public TextMeshProUGUI[] levelScores = new TextMeshProUGUI[5]; // Display scores for each level
-    private int unlockedLevels = 1; // Start with level 1 unlocked
-    private int[] levelHighScores = new int[5]; // Track high scores for each level
+    // Display scores for each level
+    public TextMeshProUGUI[] levelScores = new TextMeshProUGUI[5]; 
+    // Start with level 1 unlocked
+    private int unlockedLevels = 1; 
+    // Track high scores for each level
+    private int[] levelHighScores = new int[5]; 
     
     [Header("Cutscene Settings")]
     public VideoPlayer videoPlayer;
@@ -62,7 +69,9 @@ public class MainMenuManager : MonoBehaviour
     private int selectedLevel = -1;
     private bool isPlayingCutscene = false;
     private Coroutine alienCoroutine;
-    
+
+    // load our menu in, and get our audio 
+    // our menu doesn't have backround audio as I found it annoying 
     void Start()
     {
         CreateMainMenuUI();
