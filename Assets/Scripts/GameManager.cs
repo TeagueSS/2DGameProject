@@ -81,6 +81,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI windStrengthText; 
     public GameObject gameOverPanel;
     // Button to pause and return to menu
+    // In the context of when you're playing theyre the same 
     public Button pauseButton;
     private Canvas mainCanvas;
 
@@ -131,6 +132,7 @@ public class GameManager : MonoBehaviour
         InitializeGame();
     }
 
+    // Update all of our objects 
     void Update()
     {
         if (!isGameOver && !isPaused)
@@ -140,6 +142,7 @@ public class GameManager : MonoBehaviour
             UpdateCurrentBlockPosition(); 
             UpdateHeight();
             // Score is based on max height
+            // and how many cars have been placed on the current level 
             UpdateScore(); 
             CheckFallenBlocks();
             UpdateUI();
@@ -147,15 +150,18 @@ public class GameManager : MonoBehaviour
             // Check for level completion
             if (isLevelMode)
             {
+                // And double check they haven't gone high enough to end the game
                 CheckLevelVictory();
             }
         }
     }
 
+
     void InitializeLayers()
     {
     }
 
+    // Loadin all the things in our game 
     void InitializeGame()
     {
         // Find camera controller
@@ -165,6 +171,7 @@ public class GameManager : MonoBehaviour
         mainCanvas = FindObjectOfType<Canvas>();
         if (mainCanvas == null)
         {
+            // And our menu, our canvas and everything else we need to render 
             GameObject canvasObj = new GameObject("MainCanvas");
             mainCanvas = canvasObj.AddComponent<Canvas>();
             mainCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -176,9 +183,12 @@ public class GameManager : MonoBehaviour
         CreateUIElements();
 
         // Find or add weather system
+        // This should be a dragged prefab 
         if (weatherSystem == null)
         {
+            // In which case it goes here 
             weatherSystem = FindObjectOfType<WeatherSystem>();
+            // But if they haven't created it add it so we can start the game 
             if (weatherSystem == null)
             {
                 weatherSystem = gameObject.AddComponent<WeatherSystem>();
@@ -188,6 +198,7 @@ public class GameManager : MonoBehaviour
         // Link weather system UI (but we won't show weather text)
         if (weatherSystem != null && weatherText != null)
         {
+            //
             weatherSystem.weatherText = weatherText;
         }
 
@@ -197,6 +208,7 @@ public class GameManager : MonoBehaviour
         // Set up spawn point if not assigned
         if (spawnPoint == null)
         {
+            // And spawn in our spawn point so all of our objects know where to go 
             GameObject spawnObj = new GameObject("SpawnPoint");
             spawnPoint = spawnObj.transform;
             spawnPoint.position = new Vector3(0, spawnHeight, 0);
@@ -206,25 +218,33 @@ public class GameManager : MonoBehaviour
         blockDropper = FindObjectOfType<BlockDropper>();
         if (blockDropper == null)
         {
+            // Spawn in our block dropper 
+            // And position it based on everything around it 
             GameObject dropperObj = new GameObject("BlockDropper");
             dropperObj.transform.position = spawnPoint.position;
             blockDropper = dropperObj.AddComponent<BlockDropper>();
         }
+        //Initalize it to where it should be based on the level 
         blockDropper.Initialize(this);
 
         // Reset camera at game start
         if (cameraController != null)
         {
+            // And reset our camera 
             cameraController.ResetCamera();
         }
 
         // Initialize scale array if not set
         if (blockPrefabScaleMultipliers == null || blockPrefabScaleMultipliers.Length != voxelBlockPrefabs.Length)
         {
+            //Multipliers for how large we want the blocks we drop to be 
+            // I never got this working but the idea is still sound 
             blockPrefabScaleMultipliers = new float[voxelBlockPrefabs.Length];
+            // Loop through all of our block
             for (int i = 0; i < blockPrefabScaleMultipliers.Length; i++)
             {
-                blockPrefabScaleMultipliers[i] = 1f; // Default to 1x multiplier
+                // And  increment their size 
+                blockPrefabScaleMultipliers[i] = 1f; 
             }
         }
 
@@ -244,15 +264,18 @@ public class GameManager : MonoBehaviour
         }
 
         // Create new platform
+        // Create a cube so we can stretch it 
         currentPlatform = GameObject.CreatePrimitive(PrimitiveType.Cube);
         currentPlatform.name = "Base_Platform";
         currentPlatform.transform.position = Vector3.zero;
         currentPlatform.transform.localScale = platformDimensions;
-        
+
         // Set platform material/color
+        // Se the material and make it gray 
         MeshRenderer renderer = currentPlatform.GetComponent<MeshRenderer>();
         if (renderer != null)
         {
+            // make sure it actually exists and that the color actually exists
             if (platformMaterial != null)
             {
                 renderer.material = platformMaterial;
@@ -276,6 +299,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Platform created at {currentPlatform.transform.position} with dimensions {platformDimensions}");
     }
 
+    // Load in all of our UI elements to display the score 
     void CreateUIElements()
     {
         // Create score text (top left with black background)
@@ -283,11 +307,13 @@ public class GameManager : MonoBehaviour
         {
             GameObject scoreObj = new GameObject("ScoreText");
             scoreObj.transform.SetParent(mainCanvas.transform, false);
-            
+
             // Create background panel for score
+            // this is a gray block so it's easier to see 
             Image bgImage = scoreObj.AddComponent<Image>();
             bgImage.color = new Color(0, 0, 0, 0.5f);
             
+            // Create our score 
             RectTransform scoreRect = scoreObj.GetComponent<RectTransform>();
             scoreRect.anchorMin = new Vector2(0, 1);
             scoreRect.anchorMax = new Vector2(0, 1);
@@ -304,6 +330,7 @@ public class GameManager : MonoBehaviour
             scoreText.color = Color.white;
             scoreText.alignment = TextAlignmentOptions.TopLeft;
             
+            // Set our text block 
             RectTransform textRect = textObj.GetComponent<RectTransform>();
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
@@ -366,10 +393,7 @@ public class GameManager : MonoBehaviour
             powerUpRect.anchoredPosition = new Vector2(0, -100);
         }
 
-        // NO WEATHER TEXT - We're removing this display
-        
-        // NO WIND STRENGTH TEXT - We're removing this display too
-
+      
         // Create game over panel (initially hidden)
         if (gameOverPanel == null)
         {
@@ -403,37 +427,42 @@ public class GameManager : MonoBehaviour
             gameOverPanel = gameOverObj;
             gameOverPanel.SetActive(false);
         }
-        
+
         // Create pause button - CENTER TOP
+        // This is the menu button and allows the player to go back 
         if (pauseButton == null)
         {
+            // Create our pause button 
             GameObject pauseObj = new GameObject("PauseButton");
             pauseObj.transform.SetParent(mainCanvas.transform, false);
-            
+            // Add a button image 
             Image btnImg = pauseObj.AddComponent<Image>();
             btnImg.color = Color.white;
-            
+            // And add a listener to it 
             pauseButton = pauseObj.AddComponent<Button>();
             pauseButton.onClick.AddListener(PauseAndMenu);
-            
+
             RectTransform pauseRect = pauseObj.GetComponent<RectTransform>();
-            // CENTER TOP
+            // Move the button to the top center 
             pauseRect.anchorMin = new Vector2(0.5f, 1);
             pauseRect.anchorMax = new Vector2(0.5f, 1);
             pauseRect.pivot = new Vector2(0.5f, 1);
             pauseRect.sizeDelta = new Vector2(120, 40);
-            pauseRect.anchoredPosition = new Vector2(0, -10); // 10 pixels from top
-            
+            // Move it 10 pixels down from top so it doesn't clip 
+            pauseRect.anchoredPosition = new Vector2(0, -10); 
+
             // Create button text
             GameObject btnText = new GameObject("Text");
             btnText.transform.SetParent(pauseObj.transform, false);
-            
+
+            // Load in our text mesh for the button 
             TextMeshProUGUI buttonText = btnText.AddComponent<TextMeshProUGUI>();
             buttonText.text = "MENU";
             buttonText.fontSize = 20;
             buttonText.color = Color.black;
             buttonText.alignment = TextAlignmentOptions.Center;
-            
+
+            //Move our backround in place 
             RectTransform btnTextRect = btnText.GetComponent<RectTransform>();
             btnTextRect.anchorMin = Vector2.zero;
             btnTextRect.anchorMax = Vector2.one;
@@ -441,6 +470,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Handle the movement of the block dropper,
+    // dropping blocks 
+    // and the clicking of the Menu buttons 
     void HandleInput()
     {
         if (currentBlock == null) 
@@ -482,15 +514,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Update our block based on where the player moves it 
     void UpdateCurrentBlockPosition()
     {
         // Keep current block at a height relative to camera
         if (currentBlock != null && !currentBlock.GetComponent<BlockController>()?.isDropped == true)
-        {
+        {   
+            // Initalize our camera if it doesn't exist
             if (cameraController != null)
             {
                 Vector3 blockPos = currentBlock.transform.position;
-                blockPos.y = cameraController.transform.position.y + 5f; // Keep block 5 units above camera center
+                // Keep block 5 units above camera center
+                blockPos.y = cameraController.transform.position.y + 5f;
                 currentBlock.transform.position = blockPos;
             }
         }
@@ -517,46 +552,53 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Spawn the block we want to drop 
     void SpawnBlock()
     {
         if (voxelBlockPrefabs != null && voxelBlockPrefabs.Length > 0)
         {
             // Select a random block prefab
+            // from our array 
             int randomIndex = Random.Range(0, voxelBlockPrefabs.Length);
             GameObject selectedPrefab = voxelBlockPrefabs[randomIndex];
 
+            // Make sure we actually selected a block 
             if (selectedPrefab != null)
             {
                 // Spawn the block at the spawn point
+                // (Were our block dropper is)
                 currentBlock = Instantiate(selectedPrefab, spawnPoint.position, Quaternion.identity);
                 currentBlock.name = "VoxelBlock_" + Time.time;
-                
+
                 // Apply scale multiplier for this specific block type
+                // Here they are all hard coded to 1 as it didn't work 
                 float scaleMultiplier = 1f;
                 if (blockPrefabScaleMultipliers != null && randomIndex < blockPrefabScaleMultipliers.Length)
                 {
                     scaleMultiplier = blockPrefabScaleMultipliers[randomIndex];
                 }
-                
-                // Apply both global and specific scale
+
+                // Transform it based on the GUI and the predefined 
                 currentBlock.transform.localScale = Vector3.one * globalBlockScale * scaleMultiplier;
 
                 // Add and initialize BlockController
                 BlockController bc = currentBlock.GetComponent<BlockController>();
                 if (bc == null)
                 {
+                    // Add our block controller 
                     bc = currentBlock.AddComponent<BlockController>();
                 }
                 bc.Initialize(this, freezeDelay);
 
                 // Set layer for preview (doesn't collide with dropped blocks)
                 SetLayerRecursively(currentBlock, LayerMask.NameToLayer(previewLayer));
-                
+
                 Debug.Log($"Spawned block: {selectedPrefab.name} with scale multiplier {scaleMultiplier} (total scale: {globalBlockScale * scaleMultiplier})");
             }
         }
         else
         {
+            // Debug when I couldnt place before 
             Debug.LogWarning("No voxel block prefabs assigned! Please add prefabs in the inspector.");
         }
     }
@@ -585,16 +627,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Check our blocks actually fell 
     void CheckFallenBlocks()
     {
+        // Check we have active clocks 
         for (int i = activeBlocks.Count - 1; i >= 0; i--)
         {
+            // if they don't exist remove them from the array 
             if (activeBlocks[i] == null)
             {
                 activeBlocks.RemoveAt(i);
                 continue;
             }
-
+            // If they fell to far remove them 
             if (activeBlocks[i].transform.position.y < despawnHeight)
             {
                 Destroy(activeBlocks[i]);
@@ -603,16 +648,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Update our max height (If our blocks were properly frozen)
     void UpdateHeight()
     {
         // Track the maximum height reached
         foreach (GameObject block in activeBlocks)
         {
+            // Check it's still valid 
             if (block != null)
             {
+                // get our block controller 
                 BlockController bc = block.GetComponent<BlockController>();
+                // Make sure it's not null 
                 if (bc != null && bc.isFrozen)
                 {
+                    // Set our height 
                     float height = block.transform.position.y;
                     if (height > currentMaxHeight)
                     {
@@ -623,20 +673,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Update the score in our text box 
     void UpdateScore()
     {
-        // ORIGINAL SCORE CALCULATION: Score based on height (10 points per meter) minus blocks used
+        //  Score based on height (10 points per meter) minus blocks used
         int heightScore = Mathf.RoundToInt(currentMaxHeight * 10);
         currentScore = heightScore - blocksUsed;
     }
 
+    // Update all of our text boxes 
     void UpdateUI()
     {
+        // make sure our text isn't null 
         if (scoreText != null)
         {
+            // If it isn't then update it 
             scoreText.text = $"Score: {currentScore}\nBlocks: {blocksUsed}";
         }
         
+        // If it is spawn in that text box 
         if (heightText != null)
         {
             if (isLevelMode)
@@ -650,13 +705,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Set pause to true
     public void PauseAndMenu()
     {
+        // time to 0
+        // and load our menu canvas 
         isPaused = true;
         Time.timeScale = 0f;
         ReturnToMenu();
     }
 
+    // Add a game over pannel to tell them they won !!!
     public void GameOver()
     {
         isGameOver = true;

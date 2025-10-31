@@ -617,7 +617,7 @@ public class WeatherSystem : MonoBehaviour
         
         mesh.uv = uvs;
     }
-
+    
     /// <summary>
     /// Updates background position to follow camera (NO LONGER NEEDED - backgrounds are static)
     /// Keeping method for backward compatibility but it does nothing
